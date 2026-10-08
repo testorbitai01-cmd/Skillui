@@ -320,21 +320,21 @@ app.post('/api/triage', (req: Request, res: Response) => {
 
     matchedToolsList = [
       {
-        toolId: 'tool-search-students',
+        toolId: 'tool-c1',
         toolName: 'search_students',
         confidence: 0.95,
         reason: `Locate active session ID for candidate ${regId}`,
         extractedArgs: { registrationNumber: regId },
       },
       {
-        toolId: 'tool-get-proctoring-events',
+        toolId: 'tool-p2',
         toolName: 'get_proctoring_events',
         confidence: 0.91,
         reason: 'Review pre-disconnection warning log & tab switches',
         extractedArgs: { sessionId: 'sess_live_771' },
       },
       {
-        toolId: 'tool-approve-reentry',
+        toolId: 'tool-p6',
         toolName: 'approve_reentry_request',
         confidence: 0.98,
         reason: `Grant candidate reentry with +${extraMins} minutes time extension`,
@@ -360,14 +360,14 @@ app.post('/api/triage', (req: Request, res: Response) => {
 
     matchedToolsList = [
       {
-        toolId: 'tool-search-questions',
+        toolId: 'tool-q1',
         toolName: 'search_questions',
         confidence: 0.92,
         reason: 'Search question bank pool for matching subject tags',
         extractedArgs: { domainSlug: 'aiml-eng', limit: 25 },
       },
       {
-        toolId: 'tool-create-paper',
+        toolId: 'tool-q6',
         toolName: 'create_paper',
         confidence: 0.96,
         reason: 'Construct structured paper schema with section configuration',

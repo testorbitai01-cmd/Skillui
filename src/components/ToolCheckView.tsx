@@ -17,10 +17,35 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
   const [checkedToolIds, setCheckedToolIds] = useState<Set<string>>(new Set());
   const [filterServer, setFilterServer] = useState<string>('ALL');
 
-  const selectedTool = tools.find(t => t.id === selectedToolId) || tools[0];
-
-  // Derive unique server names
+  // Derive unique server names (excluding root endpoint if present)
   const uniqueServers = Array.from(new Set(tools.map(t => t.serviceName)));
+
+  // Calculate filtered tools based on selected server
+  const filteredTools = filterServer === 'ALL'
+    ? tools
+    : tools.filter(t => t.serviceName === filterServer);
+
+  // Sync selectedToolId when preselectedToolId changes or when filterServer changes
+  useEffect(() => {
+    if (preselectedToolId) {
+      const targetTool = tools.find(t => t.id === preselectedToolId);
+      if (targetTool) {
+        setSelectedToolId(preselectedToolId);
+        if (filterServer !== 'ALL' && targetTool.serviceName !== filterServer) {
+          setFilterServer('ALL');
+        }
+      }
+    }
+  }, [preselectedToolId]);
+
+  // Ensure selectedToolId belongs to filteredTools when filter changes
+  useEffect(() => {
+    if (filteredTools.length > 0 && !filteredTools.some(t => t.id === selectedToolId)) {
+      setSelectedToolId(filteredTools[0].id);
+    }
+  }, [filterServer, filteredTools]);
+
+  const selectedTool = tools.find(t => t.id === selectedToolId) || filteredTools[0] || tools[0];
 
   useEffect(() => {
     if (selectedTool) {
@@ -33,6 +58,9 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
     if (!selectedTool) return;
     setLoading(true);
     setExecutionResult(null);
+
+    // Track checked tool immediately upon test execution
+    setCheckedToolIds(prev => new Set(prev).add(selectedTool.id));
 
     let parsedArgs = {};
     try {
@@ -57,9 +85,6 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
       });
       const data = await res.json();
       setExecutionResult(data);
-      
-      // Add tool to checked set upon successful execution
-      setCheckedToolIds(prev => new Set(prev).add(selectedTool.id));
     } catch (err: any) {
       setExecutionResult({
         error: err.message || 'Execution failed',
@@ -70,9 +95,8 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
     }
   };
 
-  const filteredTools = filterServer === 'ALL'
-    ? tools
-    : tools.filter(t => t.serviceName === filterServer);
+  // Calculate checked tools within current filter scope
+  const checkedInFilterCount = filteredTools.filter(t => checkedToolIds.has(t.id)).length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -94,10 +118,10 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
             <Wrench size={18} color="var(--brand-blue)" />
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--text-primary)' }}>
-            {tools.length}
+            {filteredTools.length} {filterServer !== 'ALL' ? `/ ${tools.length}` : ''}
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-            Across all 4 MCP services
+            {filterServer === 'ALL' ? `Across all ${uniqueServers.length} MCP services` : `Filtered by ${filterServer}`}
           </div>
         </div>
 
@@ -107,10 +131,10 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
             <Server size={18} color="var(--accent-purple)" />
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--text-primary)' }}>
-            {uniqueServers.length}
+            {filterServer === 'ALL' ? uniqueServers.length : 1}
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            <CheckCircle2 size={12} /> All 4 Microservices Online
+            <CheckCircle2 size={12} /> {filterServer === 'ALL' ? 'All 4 Microservices Online' : `${filterServer} Active`}
           </div>
         </div>
 
@@ -120,10 +144,10 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
             <CheckSquare size={18} color="var(--accent-emerald)" />
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--accent-emerald)' }}>
-            {checkedToolIds.size} / {tools.length}
+            {checkedInFilterCount} / {filteredTools.length}
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-            Tested during session
+            Tested during current session ({checkedToolIds.size} total tested)
           </div>
         </div>
       </div>
@@ -146,21 +170,27 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
                 fontSize: '0.85rem',
                 fontWeight: 600,
                 marginTop: '0.25rem',
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-color)',
               }}
             >
-              <option value="ALL">All MCP Servers (4 Microservices)</option>
-              {uniqueServers.map(server => (
-                <option key={server} value={server}>
-                  {server}
-                </option>
-              ))}
+              <option value="ALL">All MCP Servers ({uniqueServers.length} Microservices — {tools.length} Tools)</option>
+              {uniqueServers.map(server => {
+                const count = tools.filter(t => t.serviceName === server).length;
+                return (
+                  <option key={server} value={server}>
+                    {server} ({count} Tools)
+                  </option>
+                );
+              })}
             </select>
           </div>
 
           {/* Tool Dropdown Selector */}
           <div style={{ flex: 1.2 }}>
             <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Select Tool to Check
+              Select Tool to Check ({filteredTools.length} Available)
             </label>
             <select
               value={selectedToolId}
@@ -172,6 +202,9 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
                 fontSize: '0.85rem',
                 fontWeight: 600,
                 marginTop: '0.25rem',
+                background: 'var(--bg-card)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-color)',
               }}
             >
               {filteredTools.map(tool => (
@@ -187,7 +220,7 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
       {/* 🎴 Tools Grid (Card Format View) */}
       <div>
         <h4 style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
-          Select Tool Card to Test
+          Select Tool Card to Test ({filteredTools.length} Tools Shown)
         </h4>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
           {filteredTools.map(tool => {
@@ -345,3 +378,4 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
     </div>
   );
 };
+

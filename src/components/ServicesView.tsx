@@ -46,6 +46,12 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
     });
   };
 
+  // Filter out root endpoint for accurate tool and microservice metrics calculation
+  const microservices = services.filter(s => s.id !== 'srv-unified-root');
+  const activeMicroservicesCount = microservices.filter(s => s.status === 'ACTIVE').length;
+  const totalDistinctToolsCount = microservices.reduce((acc, s) => acc + s.toolsCount, 0);
+  const avgLatency = Math.round(microservices.reduce((acc, s) => acc + s.health.latencyMs, 0) / (microservices.length || 1));
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       {/* Top Banner & Action */}
@@ -67,25 +73,25 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
         <div className="glass-panel" style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            <span>Total MCP Services</span>
+            <span>Total MCP Microservices</span>
             <Server size={18} color="var(--brand-blue)" />
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--text-primary)' }}>{services.length}</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--text-primary)' }}>{microservices.length}</div>
           <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            <CheckCircle2 size={12} /> {services.filter(s => s.status === 'ACTIVE').length} Active Microservices
+            <CheckCircle2 size={12} /> {activeMicroservicesCount} Active Microservices Online
           </div>
         </div>
 
         <div className="glass-panel" style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            <span>Total Available Tools</span>
+            <span>Total Registered Tools</span>
             <Terminal size={18} color="var(--accent-purple)" />
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--text-primary)' }}>
-            {services.reduce((acc, s) => acc + s.toolsCount, 0)}
+            {totalDistinctToolsCount}
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-            Spread across {services.length} endpoints
+            Spread across {microservices.length} microservices
           </div>
         </div>
 
@@ -95,7 +101,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
             <Activity size={18} color="var(--accent-emerald)" />
           </div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--text-primary)' }}>
-            {Math.round(services.reduce((acc, s) => acc + s.health.latencyMs, 0) / (services.length || 1))} ms
+            {avgLatency} ms
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', marginTop: '0.25rem' }}>
             Healthy HTTP & SSE Transport
