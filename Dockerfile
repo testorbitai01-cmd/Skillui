@@ -16,11 +16,13 @@ ENV NODE_ENV=production
 ENV PORT=3001
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/dist-server ./dist-server
+COPY --from=builder /app/server ./server
+COPY --from=builder /app/src ./src
 
 EXPOSE 3001
 
-CMD ["node", "dist-server/index.js"]
+CMD ["npx", "tsx", "server/index.ts"]
