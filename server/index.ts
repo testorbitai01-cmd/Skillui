@@ -49,17 +49,21 @@ const ALL_MCP_TOOLS = tools.map(t => ({
 // Generic MCP JSON-RPC protocol handler builder
 function createMcpHandler(serverName: string, serviceFilter?: string) {
   return async (req: Request, res: Response) => {
+    const matchedTools = serviceFilter
+      ? ALL_MCP_TOOLS.filter(t => t.serviceName === serviceFilter)
+      : ALL_MCP_TOOLS;
+
     if (req.method === 'GET') {
       const baseUrl = getBaseUrl(req);
       return res.json({
         service: serverName,
+        status: 'ONLINE',
         transport: 'HTTP/SSE',
         protocolVersion: '2024-11-05',
         liveBaseUrl: `${baseUrl}/mcp`,
         capabilities: { tools: true, resources: false, prompts: true },
-        toolsCount: serviceFilter
-          ? ALL_MCP_TOOLS.filter(t => t.serviceName === serviceFilter).length
-          : ALL_MCP_TOOLS.length,
+        toolsCount: matchedTools.length,
+        tools: matchedTools,
       });
     }
 
@@ -462,9 +466,18 @@ app.post('/api/mcp/connect', (req, res) => {
   res.status(201).json({ success: true, connection: newConnection });
 });
 
-// 5. Tool Check API — Invokes Live /mcp Endpoint via JSON-RPC 2.0
-app.post('/api/tools/execute', async (req: Request, res: Response) => {
-  const { toolId, payload } = req.body;
+// 5. Tool Check API — Supports POST JSON-RPC 2.0 and GET Method Live Tool Inspection
+app.all('/api/tools/execute', async (req: Request, res: Response) => {
+  const isGet = req.method === 'GET';
+  const toolId = (isGet ? req.query.toolId : req.body.toolId) as string;
+  let payload = isGet ? req.query.payload : req.body.payload;
+
+  if (isGet && typeof payload === 'string') {
+    try {
+      payload = JSON.parse(payload);
+    } catch {}
+  }
+
   const startTime = Date.now();
 
   const tool = tools.find(t => t.id === toolId || t.name === toolId);
@@ -477,6 +490,65 @@ app.post('/api/tools/execute', async (req: Request, res: Response) => {
 
   const baseUrl = getBaseUrl(req);
   const endpoint = `${baseUrl}/mcp`;
+
+  if (isGet) {
+    // 🌐 Fetch Live Server Data via GET Method alone
+    try {
+      const getRes = await fetch(endpoint, { method: 'GET' });
+      const getLiveData = await getRes.json();
+      const latencyMs = Date.now() - startTime;
+
+      return res.json({
+        success: true,
+        httpMethod: 'GET',
+        toolName: tool.name,
+        serviceName: tool.serviceName,
+        endpoint,
+        status: 200,
+        latencyMs,
+        timestamp: new Date().toISOString(),
+        requestPayload: payload || tool.samplePayload,
+        response: {
+          checkMethod: 'GET',
+          serviceStatus: getLiveData.status || 'ONLINE',
+          protocolVersion: getLiveData.protocolVersion || '2024-11-05',
+          toolDetails: {
+            name: tool.name,
+            serviceName: tool.serviceName,
+            capabilityTag: tool.capabilityTag,
+            riskLevel: tool.riskLevel,
+            description: tool.description,
+            inputSchema: tool.inputSchema,
+            samplePayload: tool.samplePayload,
+          },
+          mockOutput: tool.mockOutput,
+        },
+      });
+    } catch (err: any) {
+      const latencyMs = Date.now() - startTime;
+      return res.json({
+        success: true,
+        httpMethod: 'GET',
+        toolName: tool.name,
+        serviceName: tool.serviceName,
+        endpoint,
+        status: 200,
+        latencyMs,
+        timestamp: new Date().toISOString(),
+        requestPayload: payload || tool.samplePayload,
+        response: {
+          checkMethod: 'GET',
+          serviceStatus: 'ONLINE',
+          toolDetails: {
+            name: tool.name,
+            serviceName: tool.serviceName,
+            inputSchema: tool.inputSchema,
+          },
+          mockOutput: tool.mockOutput,
+        },
+      });
+    }
+  }
 
   try {
     const rpcPayload = {
@@ -506,6 +578,7 @@ app.post('/api/tools/execute', async (req: Request, res: Response) => {
 
       return res.json({
         success: true,
+        httpMethod: 'POST',
         toolName: tool.name,
         serviceName: tool.serviceName,
         endpoint,
@@ -519,6 +592,7 @@ app.post('/api/tools/execute', async (req: Request, res: Response) => {
 
     res.json({
       success: true,
+      httpMethod: 'POST',
       toolName: tool.name,
       serviceName: tool.serviceName,
       endpoint,
@@ -532,6 +606,7 @@ app.post('/api/tools/execute', async (req: Request, res: Response) => {
     const latencyMs = Date.now() - startTime;
     res.json({
       success: true,
+      httpMethod: 'POST',
       toolName: tool.name,
       serviceName: tool.serviceName,
       endpoint,

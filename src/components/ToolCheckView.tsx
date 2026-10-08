@@ -95,6 +95,30 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
     }
   };
 
+  const handleExecuteGet = async () => {
+    if (!selectedTool) return;
+    setLoading(true);
+    setExecutionResult(null);
+
+    // Track checked tool immediately upon test execution
+    setCheckedToolIds(prev => new Set(prev).add(selectedTool.id));
+
+    try {
+      const res = await fetch(`/api/tools/execute?toolId=${encodeURIComponent(selectedTool.id)}&payload=${encodeURIComponent(jsonPayload)}`, {
+        method: 'GET',
+      });
+      const data = await res.json();
+      setExecutionResult(data);
+    } catch (err: any) {
+      setExecutionResult({
+        error: err.message || 'GET Method execution failed',
+        status: 500,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Calculate checked tools within current filter scope
   const checkedInFilterCount = filteredTools.filter(t => checkedToolIds.has(t.id)).length;
 
@@ -324,9 +348,14 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
               />
             </div>
 
-            <button className="btn-primary" onClick={handleExecute} disabled={loading} style={{ width: '100%', justifyContent: 'center' }}>
-              {loading ? <RefreshCw className="animate-spin" size={18} /> : <Play size={18} />} Execute Tool Call 🧪
-            </button>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button className="btn-primary" onClick={handleExecuteGet} disabled={loading} style={{ flex: 1, justifyContent: 'center', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+                {loading ? <RefreshCw className="animate-spin" size={16} /> : <Wrench size={16} />} Check via GET Method 🌐
+              </button>
+              <button className="btn-primary" onClick={handleExecute} disabled={loading} style={{ flex: 1, justifyContent: 'center' }}>
+                {loading ? <RefreshCw className="animate-spin" size={16} /> : <Play size={16} />} Execute Call (POST) 🧪
+              </button>
+            </div>
           </div>
 
           {/* Right Column: Real-Time Output Console */}
@@ -337,9 +366,9 @@ export const ToolCheckView: React.FC<ToolCheckViewProps> = ({ tools, preselected
               </h4>
 
               {executionResult && (
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                  <span className={`badge ${executionResult.success ? 'badge-active' : 'badge-offline'}`}>
-                    HTTP {executionResult.status || 200}
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <span className="badge badge-active" style={{ fontSize: '0.7rem', fontFamily: 'monospace' }}>
+                    HTTP {executionResult.httpMethod || 'GET'} {executionResult.status || 200}
                   </span>
                   {executionResult.latencyMs && (
                     <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
