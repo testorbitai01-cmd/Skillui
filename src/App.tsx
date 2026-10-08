@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Server, Layers, Target, Eye, Wrench, Activity, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Server, Layers, Target, Eye, Wrench, Activity, Sun, Moon, CheckCircle2 } from 'lucide-react';
 import { ServicesView } from './components/ServicesView';
 import { CapabilitiesView } from './components/CapabilitiesView';
 import { TriageView } from './components/TriageView';
@@ -18,10 +18,23 @@ type Tab = 'services' | 'capabilities' | 'triage' | 'mcp' | 'tool-check';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('services');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('testorbit-theme') as 'light' | 'dark') || 'light';
+  });
   const [services, setServices] = useState<MCPService[]>(INITIAL_SERVICES);
   const [tools, setTools] = useState<MCPTool[]>(INITIAL_TOOLS);
   const [inspectorSessions, setInspectorSessions] = useState<MCPInspectorConnection[]>(INITIAL_INSPECTOR_SESSIONS);
   const [selectedToolForCheck, setSelectedToolForCheck] = useState<string>('');
+
+  // Sync theme with HTML root tag attribute
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('testorbit-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   // Fetch real data from backend API if available
   useEffect(() => {
@@ -111,12 +124,12 @@ export default function App() {
       {/* Left Sidebar Navigation */}
       <aside style={{
         width: '270px',
-        background: 'rgba(11, 18, 32, 0.96)',
+        background: 'var(--sidebar-bg)',
         borderRight: '1px solid var(--border-color)',
         padding: '1.5rem 1rem',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
+        justify: 'space-between',
         position: 'fixed',
         top: 0,
         bottom: 0,
@@ -125,26 +138,46 @@ export default function App() {
       }}>
         <div>
           {/* Logo Brand using official TestOrbit Brand Logo */}
-          <div style={{ padding: '0 0.5rem', marginBottom: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ padding: '0 0.5rem', marginBottom: '1.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
               <img
                 src="/logo-dark.png"
                 alt="TestOrbit Logo"
                 onError={(e) => {
-                  // Fallback to logo.png if logo-dark.png isn't available
                   (e.target as HTMLImageElement).src = '/logo.png';
                 }}
-                style={{ height: '36px', objectFit: 'contain' }}
+                style={{ height: '34px', objectFit: 'contain' }}
               />
-              <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '0.6rem' }}>
+              <div style={{ borderLeft: '1px solid rgba(255,255,255,0.15)', paddingLeft: '0.5rem' }}>
                 <h1 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#ffffff', lineHeight: '1.1' }}>
                   Skill<span className="gradient-text">UI</span>
                 </h1>
-                <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '0.15rem' }}>
+                <p style={{ fontSize: '0.62rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '0.1rem' }}>
                   MCP Control Center
                 </p>
               </div>
             </div>
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: 'none',
+                borderRadius: '8px',
+                width: '32px',
+                height: '32px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ffffff',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+            </button>
           </div>
 
           {/* Sidebar Navigation Items */}
@@ -163,13 +196,13 @@ export default function App() {
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                background: activeTab === 'services' ? 'rgba(37, 99, 235, 0.22)' : 'transparent',
-                color: activeTab === 'services' ? '#ffffff' : 'var(--text-secondary)',
+                background: activeTab === 'services' ? 'var(--sidebar-active-bg)' : 'transparent',
+                color: activeTab === 'services' ? '#ffffff' : 'var(--sidebar-text)',
                 borderLeft: activeTab === 'services' ? '3px solid var(--brand-blue)' : '3px solid transparent',
                 transition: 'all 0.15s ease',
               }}
             >
-              <Server size={18} color={activeTab === 'services' ? 'var(--accent-cyan)' : 'currentColor'} />
+              <Server size={18} color={activeTab === 'services' ? '#38bdf8' : 'currentColor'} />
               1. Services
             </button>
 
@@ -187,13 +220,13 @@ export default function App() {
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                background: activeTab === 'capabilities' ? 'rgba(37, 99, 235, 0.22)' : 'transparent',
-                color: activeTab === 'capabilities' ? '#ffffff' : 'var(--text-secondary)',
+                background: activeTab === 'capabilities' ? 'var(--sidebar-active-bg)' : 'transparent',
+                color: activeTab === 'capabilities' ? '#ffffff' : 'var(--sidebar-text)',
                 borderLeft: activeTab === 'capabilities' ? '3px solid var(--brand-blue)' : '3px solid transparent',
                 transition: 'all 0.15s ease',
               }}
             >
-              <Layers size={18} color={activeTab === 'capabilities' ? 'var(--brand-blue-light)' : 'currentColor'} />
+              <Layers size={18} color={activeTab === 'capabilities' ? '#6098fa' : 'currentColor'} />
               2. Capability
             </button>
 
@@ -211,13 +244,13 @@ export default function App() {
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                background: activeTab === 'triage' ? 'rgba(37, 99, 235, 0.22)' : 'transparent',
-                color: activeTab === 'triage' ? '#ffffff' : 'var(--text-secondary)',
+                background: activeTab === 'triage' ? 'var(--sidebar-active-bg)' : 'transparent',
+                color: activeTab === 'triage' ? '#ffffff' : 'var(--sidebar-text)',
                 borderLeft: activeTab === 'triage' ? '3px solid var(--brand-blue)' : '3px solid transparent',
                 transition: 'all 0.15s ease',
               }}
             >
-              <Target size={18} color={activeTab === 'triage' ? 'var(--accent-purple)' : 'currentColor'} />
+              <Target size={18} color={activeTab === 'triage' ? '#c084fc' : 'currentColor'} />
               3. Triage
             </button>
 
@@ -235,8 +268,8 @@ export default function App() {
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                background: activeTab === 'mcp' ? 'rgba(37, 99, 235, 0.22)' : 'transparent',
-                color: activeTab === 'mcp' ? '#ffffff' : 'var(--text-secondary)',
+                background: activeTab === 'mcp' ? 'var(--sidebar-active-bg)' : 'transparent',
+                color: activeTab === 'mcp' ? '#ffffff' : 'var(--sidebar-text)',
                 borderLeft: activeTab === 'mcp' ? '3px solid var(--brand-blue)' : '3px solid transparent',
                 transition: 'all 0.15s ease',
               }}
@@ -259,8 +292,8 @@ export default function App() {
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                background: activeTab === 'tool-check' ? 'rgba(37, 99, 235, 0.22)' : 'transparent',
-                color: activeTab === 'tool-check' ? '#ffffff' : 'var(--text-secondary)',
+                background: activeTab === 'tool-check' ? 'var(--sidebar-active-bg)' : 'transparent',
+                color: activeTab === 'tool-check' ? '#ffffff' : 'var(--sidebar-text)',
                 borderLeft: activeTab === 'tool-check' ? '3px solid var(--brand-blue)' : '3px solid transparent',
                 transition: 'all 0.15s ease',
               }}
@@ -271,9 +304,9 @@ export default function App() {
           </nav>
         </div>
 
-        {/* TestOrbit Platform Card */}
-        <div style={{ padding: '0.85rem', background: 'rgba(17, 26, 46, 0.8)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>TestOrbit Campus Ecosystem</div>
+        {/* TestOrbit Platform Status */}
+        <div style={{ padding: '0.85rem', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+          <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>TestOrbit Campus Ecosystem</div>
           <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#34d399', display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem' }}>
             <Activity size={12} /> TestOrbit Connected
           </div>

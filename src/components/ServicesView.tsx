@@ -68,9 +68,9 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
         <div className="glass-panel" style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
             <span>Total MCP Services</span>
-            <Server size={18} color="var(--accent-cyan)" />
+            <Server size={18} color="var(--brand-blue)" />
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem' }}>{services.length}</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--text-primary)' }}>{services.length}</div>
           <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
             <CheckCircle2 size={12} /> {services.filter(s => s.status === 'ACTIVE').length} Active Microservices
           </div>
@@ -79,9 +79,9 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
         <div className="glass-panel" style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
             <span>Total Available Tools</span>
-            <Terminal size={18} color="var(--accent-indigo)" />
+            <Terminal size={18} color="var(--accent-purple)" />
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--text-primary)' }}>
             {services.reduce((acc, s) => acc + s.toolsCount, 0)}
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
@@ -94,7 +94,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
             <span>Avg Network Latency</span>
             <Activity size={18} color="var(--accent-emerald)" />
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, marginTop: '0.5rem', color: 'var(--text-primary)' }}>
             {Math.round(services.reduce((acc, s) => acc + s.health.latencyMs, 0) / (services.length || 1))} ms
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--accent-emerald)', marginTop: '0.25rem' }}>
@@ -115,12 +115,12 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                     {service.status}
                   </span>
                 </div>
-                <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.05)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+                <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--text-muted)', background: 'rgba(0,0,0,0.05)', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)' }}>
                   {service.transport}
                 </span>
               </div>
 
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginTop: '0.75rem', color: '#ffffff' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginTop: '0.75rem', color: 'var(--text-primary)' }}>
                 {service.name}
               </h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.4rem', lineHeight: '1.4' }}>
@@ -129,7 +129,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '1rem' }}>
                 {service.tags.map(t => (
-                  <span key={t} style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', borderRadius: '6px', background: 'rgba(99, 102, 241, 0.12)', color: '#818cf8', border: '1px solid rgba(99, 102, 241, 0.25)' }}>
+                  <span key={t} style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem', borderRadius: '6px', background: 'rgba(37, 99, 235, 0.1)', color: 'var(--brand-blue)', border: '1px solid rgba(37, 99, 235, 0.25)', fontWeight: 600 }}>
                     {t}
                   </span>
                 ))}
@@ -138,17 +138,17 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
 
             <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', textAlign: 'center', gap: '0.5rem' }}>
-                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: '8px' }}>
+                <div style={{ background: 'rgba(0,0,0,0.03)', padding: '0.5rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Tools</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent-cyan)' }}>{service.toolsCount}</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--brand-blue)' }}>{service.toolsCount}</div>
                 </div>
-                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: '8px' }}>
+                <div style={{ background: 'rgba(0,0,0,0.03)', padding: '0.5rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Latency</div>
                   <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--accent-emerald)' }}>{service.health.latencyMs}ms</div>
                 </div>
-                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: '8px' }}>
+                <div style={{ background: 'rgba(0,0,0,0.03)', padding: '0.5rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
                   <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Uptime</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f8fafc' }}>{service.health.uptimePct}%</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{service.health.uptimePct}%</div>
                 </div>
               </div>
 
@@ -162,9 +162,9 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
 
       {/* Modal for adding Service */}
       {showModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '1rem' }}>
-          <div className="glass-panel" style={{ width: '100%', maxWidth: '500px', padding: '2rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem' }}>Register New MCP Service</h3>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '1rem' }}>
+          <div className="glass-panel" style={{ width: '100%', maxWidth: '500px', padding: '2rem', background: 'var(--bg-card)' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)' }}>Register New MCP Service</h3>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
                 <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Service Name</label>
@@ -174,7 +174,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                   placeholder="e.g. testorbit-notifications-mcp"
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
-                  style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'white', marginTop: '0.25rem' }}
+                  style={{ width: '100%', padding: '0.6rem', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-primary)', marginTop: '0.25rem' }}
                 />
               </div>
 
@@ -185,7 +185,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                   placeholder="Describe what capabilities this MCP service provides..."
                   value={formData.description}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'white', marginTop: '0.25rem', height: '70px' }}
+                  style={{ width: '100%', padding: '0.6rem', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-primary)', marginTop: '0.25rem', height: '70px' }}
                 />
               </div>
 
@@ -195,7 +195,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                   <select
                     value={formData.transport}
                     onChange={e => setFormData({ ...formData, transport: e.target.value as any })}
-                    style={{ width: '100%', padding: '0.6rem', background: 'rgba(15, 23, 42, 0.9)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'white', marginTop: '0.25rem' }}
+                    style={{ width: '100%', padding: '0.6rem', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-primary)', marginTop: '0.25rem' }}
                   >
                     <option value="SSE">SSE (Server-Sent Events)</option>
                     <option value="HTTP">HTTP Endpoint</option>
@@ -208,7 +208,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                     type="number"
                     value={formData.port}
                     onChange={e => setFormData({ ...formData, port: Number(e.target.value) })}
-                    style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'white', marginTop: '0.25rem' }}
+                    style={{ width: '100%', padding: '0.6rem', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-primary)', marginTop: '0.25rem' }}
                   />
                 </div>
               </div>
@@ -220,7 +220,7 @@ export const ServicesView: React.FC<ServicesViewProps> = ({
                   placeholder="http://localhost:4005/mcp"
                   value={formData.endpoint}
                   onChange={e => setFormData({ ...formData, endpoint: e.target.value })}
-                  style={{ width: '100%', padding: '0.6rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'white', marginTop: '0.25rem' }}
+                  style={{ width: '100%', padding: '0.6rem', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-primary)', marginTop: '0.25rem' }}
                 />
               </div>
 
