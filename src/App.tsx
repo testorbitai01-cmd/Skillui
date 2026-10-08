@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Server, Layers, Target, Eye, Wrench, Activity, ShieldAlert, Sparkles, Terminal } from 'lucide-react';
+import { Server, Layers, Target, Eye, Wrench, Activity, Sparkles, CheckCircle2 } from 'lucide-react';
 import { ServicesView } from './components/ServicesView';
 import { CapabilitiesView } from './components/CapabilitiesView';
 import { TriageView } from './components/TriageView';
@@ -30,9 +30,7 @@ export default function App() {
       .then(data => {
         if (data.success && data.services) setServices(data.services);
       })
-      .catch(() => {
-        // Fallback to initial mock data if server isn't running yet
-      });
+      .catch(() => {});
 
     fetch('/api/tools')
       .then(res => res.json())
@@ -54,7 +52,6 @@ export default function App() {
         setServices(prev => [...prev, data.service]);
       }
     } catch {
-      // Local fallback state
       const fallback: MCPService = {
         id: `srv-${Date.now()}`,
         name: newServiceData.name || 'Custom MCP Service',
@@ -113,13 +110,13 @@ export default function App() {
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-dark)' }}>
       {/* Left Sidebar Navigation */}
       <aside style={{
-        width: '260px',
-        background: 'rgba(11, 15, 25, 0.95)',
+        width: '270px',
+        background: 'rgba(11, 18, 32, 0.96)',
         borderRight: '1px solid var(--border-color)',
         padding: '1.5rem 1rem',
         display: 'flex',
         flexDirection: 'column',
-        justify: 'space-between',
+        justifyContent: 'space-between',
         position: 'fixed',
         top: 0,
         bottom: 0,
@@ -127,33 +124,30 @@ export default function App() {
         zIndex: 50,
       }}>
         <div>
-          {/* Logo Brand */}
-          <div style={{ padding: '0 0.75rem', marginBottom: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <div style={{
-                width: 36,
-                height: 36,
-                borderRadius: '10px',
-                background: 'linear-gradient(135deg, #38bdf8 0%, #6366f1 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 0 20px rgba(99, 102, 241, 0.5)',
-              }}>
-                <Sparkles size={20} color="#ffffff" />
-              </div>
-              <div>
-                <h1 style={{ fontSize: '1.15rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#ffffff' }}>
+          {/* Logo Brand using official TestOrbit Brand Logo */}
+          <div style={{ padding: '0 0.5rem', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <img
+                src="/logo-dark.png"
+                alt="TestOrbit Logo"
+                onError={(e) => {
+                  // Fallback to logo.png if logo-dark.png isn't available
+                  (e.target as HTMLImageElement).src = '/logo.png';
+                }}
+                style={{ height: '36px', objectFit: 'contain' }}
+              />
+              <div style={{ borderLeft: '1px solid var(--border-color)', paddingLeft: '0.6rem' }}>
+                <h1 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#ffffff', lineHeight: '1.1' }}>
                   Skill<span className="gradient-text">UI</span>
                 </h1>
-                <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '0.15rem' }}>
                   MCP Control Center
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Sidebar Menu Items */}
+          {/* Sidebar Navigation Items */}
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
             <button
               onClick={() => setActiveTab('services')}
@@ -163,15 +157,15 @@ export default function App() {
                 gap: '0.75rem',
                 padding: '0.75rem 1rem',
                 borderRadius: '10px',
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
                 fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                background: activeTab === 'services' ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+                background: activeTab === 'services' ? 'rgba(37, 99, 235, 0.22)' : 'transparent',
                 color: activeTab === 'services' ? '#ffffff' : 'var(--text-secondary)',
-                borderLeft: activeTab === 'services' ? '3px solid var(--accent-indigo)' : '3px solid transparent',
+                borderLeft: activeTab === 'services' ? '3px solid var(--brand-blue)' : '3px solid transparent',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -187,19 +181,19 @@ export default function App() {
                 gap: '0.75rem',
                 padding: '0.75rem 1rem',
                 borderRadius: '10px',
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
                 fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                background: activeTab === 'capabilities' ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+                background: activeTab === 'capabilities' ? 'rgba(37, 99, 235, 0.22)' : 'transparent',
                 color: activeTab === 'capabilities' ? '#ffffff' : 'var(--text-secondary)',
-                borderLeft: activeTab === 'capabilities' ? '3px solid var(--accent-indigo)' : '3px solid transparent',
+                borderLeft: activeTab === 'capabilities' ? '3px solid var(--brand-blue)' : '3px solid transparent',
                 transition: 'all 0.15s ease',
               }}
             >
-              <Layers size={18} color={activeTab === 'capabilities' ? 'var(--accent-indigo)' : 'currentColor'} />
+              <Layers size={18} color={activeTab === 'capabilities' ? 'var(--brand-blue-light)' : 'currentColor'} />
               2. Capability
             </button>
 
@@ -211,15 +205,15 @@ export default function App() {
                 gap: '0.75rem',
                 padding: '0.75rem 1rem',
                 borderRadius: '10px',
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
                 fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                background: activeTab === 'triage' ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+                background: activeTab === 'triage' ? 'rgba(37, 99, 235, 0.22)' : 'transparent',
                 color: activeTab === 'triage' ? '#ffffff' : 'var(--text-secondary)',
-                borderLeft: activeTab === 'triage' ? '3px solid var(--accent-indigo)' : '3px solid transparent',
+                borderLeft: activeTab === 'triage' ? '3px solid var(--brand-blue)' : '3px solid transparent',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -235,15 +229,15 @@ export default function App() {
                 gap: '0.75rem',
                 padding: '0.75rem 1rem',
                 borderRadius: '10px',
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
                 fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                background: activeTab === 'mcp' ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+                background: activeTab === 'mcp' ? 'rgba(37, 99, 235, 0.22)' : 'transparent',
                 color: activeTab === 'mcp' ? '#ffffff' : 'var(--text-secondary)',
-                borderLeft: activeTab === 'mcp' ? '3px solid var(--accent-indigo)' : '3px solid transparent',
+                borderLeft: activeTab === 'mcp' ? '3px solid var(--brand-blue)' : '3px solid transparent',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -259,15 +253,15 @@ export default function App() {
                 gap: '0.75rem',
                 padding: '0.75rem 1rem',
                 borderRadius: '10px',
-                fontSize: '0.9rem',
+                fontSize: '0.88rem',
                 fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',
-                background: activeTab === 'tool-check' ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
+                background: activeTab === 'tool-check' ? 'rgba(37, 99, 235, 0.22)' : 'transparent',
                 color: activeTab === 'tool-check' ? '#ffffff' : 'var(--text-secondary)',
-                borderLeft: activeTab === 'tool-check' ? '3px solid var(--accent-indigo)' : '3px solid transparent',
+                borderLeft: activeTab === 'tool-check' ? '3px solid var(--brand-blue)' : '3px solid transparent',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -277,17 +271,17 @@ export default function App() {
           </nav>
         </div>
 
-        {/* Sidebar Footer */}
-        <div style={{ padding: '0.75rem', background: 'rgba(0,0,0,0.3)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Microservice Status</div>
+        {/* TestOrbit Platform Card */}
+        <div style={{ padding: '0.85rem', background: 'rgba(17, 26, 46, 0.8)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>TestOrbit Campus Ecosystem</div>
           <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#34d399', display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem' }}>
-            <Activity size={12} /> Ready for Railway Deploy
+            <Activity size={12} /> TestOrbit Connected
           </div>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main style={{ marginLeft: '260px', flex: 1, padding: '2rem', maxWidth: '1400px' }}>
+      <main style={{ marginLeft: '270px', flex: 1, padding: '2rem', maxWidth: '1400px' }}>
         {activeTab === 'services' && (
           <ServicesView services={services} onAddService={handleAddService} />
         )}

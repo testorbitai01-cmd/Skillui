@@ -3,19 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --bg-dark: #080c14;
-  --bg-card: rgba(15, 23, 42, 0.75);
-  --bg-card-hover: rgba(30, 41, 59, 0.85);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-glow: rgba(99, 102, 241, 0.3);
+  /* TestOrbit Brand Color Palette */
+  --bg-dark: #0b1220;           /* TestOrbit Navy 950 */
+  --bg-dark-secondary: #111a2e; /* TestOrbit Navy 900 */
+  --bg-card: rgba(17, 26, 46, 0.82);
+  --bg-card-hover: rgba(26, 37, 64, 0.9);
+  --border-color: rgba(40, 53, 86, 0.7);
+  --border-glow: rgba(37, 99, 235, 0.4);
+  
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
+  
+  /* TestOrbit Electric Blue Brand Colors */
+  --brand-blue: #2563eb;
+  --brand-blue-hover: #1d4fd7;
+  --brand-blue-light: #6098fa;
   --accent-cyan: #38bdf8;
-  --accent-indigo: #6366f1;
-  --accent-purple: #a855f7;
   --accent-emerald: #10b981;
   --accent-amber: #f59e0b;
+  --accent-purple: #8b5cf6;
 }
 
 * {
@@ -25,41 +32,42 @@
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--bg-dark);
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.08) 0px, transparent 50%);
+    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(17, 26, 46, 0.5) 0px, transparent 100%);
   background-attachment: fixed;
 }
 
 code, pre {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
 
-/* Glassmorphism Cards */
+/* TestOrbit Glass Panels */
 .glass-panel {
   background: var(--bg-card);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+  border-radius: 14px;
+  box-shadow: 0 4px 20px 0 rgba(11, 18, 32, 0.4);
   transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .glass-panel-hover:hover {
   border-color: var(--border-glow);
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(99, 102, 241, 0.15);
+  box-shadow: 0 8px 30px 0 rgba(37, 99, 235, 0.18);
 }
 
-/* Glowing text gradients */
+/* TestOrbit Text Gradients */
 .gradient-text {
-  background: linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
+  background: linear-gradient(135deg, #6098fa 0%, #2563eb 50%, #38bdf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -70,34 +78,34 @@ code, pre {
   -webkit-text-fill-color: transparent;
 }
 
-/* Buttons */
+/* TestOrbit Brand Buttons */
 .btn-primary {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4fd7 100%);
   color: white;
   font-weight: 600;
-  padding: 0.625rem 1.25rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 10px;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #1d4fd7 0%, #1e40af 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
 }
 
 .btn-secondary {
-  background: rgba(30, 41, 59, 0.7);
+  background: rgba(26, 37, 64, 0.8);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   font-weight: 500;
-  padding: 0.625rem 1.25rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 10px;
   cursor: pointer;
   display: inline-flex;
@@ -107,8 +115,8 @@ code, pre {
 }
 
 .btn-secondary:hover {
-  background: rgba(51, 65, 85, 0.8);
-  border-color: var(--text-muted);
+  background: rgba(40, 53, 86, 0.9);
+  border-color: var(--brand-blue-light);
 }
 
 /* Status Badges */
@@ -118,7 +126,7 @@ code, pre {
   gap: 0.35rem;
   padding: 0.25rem 0.65rem;
   border-radius: 9999px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -148,12 +156,12 @@ code, pre {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(11, 18, 32, 0.5);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(51, 65, 85, 0.7);
+  background: rgba(40, 53, 86, 0.8);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.6);
+  background: var(--brand-blue);
 }

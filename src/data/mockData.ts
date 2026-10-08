@@ -66,12 +66,13 @@ export interface MCPInspectorConnection {
   };
 }
 
+// Clean, non-duplicate list of official TestOrbit MCP Microservices
 export const INITIAL_SERVICES: MCPService[] = [
   {
-    id: 'srv-1',
+    id: 'srv-questions',
     name: 'testorbit-questions-mcp',
     slug: 'questions-paper-mcp',
-    description: 'Question Bank Ingestion, Deduplication, Section Matching & Paper Assembly Engine',
+    description: 'Question Bank Ingestion, SHA-256 Deduplication, Section Matching & Paper Assembly Engine',
     status: 'ACTIVE',
     transport: 'SSE',
     endpoint: 'http://localhost:4001/mcp/sse',
@@ -87,10 +88,10 @@ export const INITIAL_SERVICES: MCPService[] = [
     tags: ['Authoring', 'Question Bank', 'Paper Assembly'],
   },
   {
-    id: 'srv-2',
+    id: 'srv-candidates',
     name: 'testorbit-candidates-mcp',
     slug: 'candidates-profile-mcp',
-    description: 'Student Registration, Education Auditing, Domain Assignment & Device Readiness Checks',
+    description: 'Student Registration, Education History Auditing, Domain Assignment & Device Readiness Checks',
     status: 'ACTIVE',
     transport: 'HTTP',
     endpoint: 'http://localhost:4002/mcp/api',
@@ -106,10 +107,10 @@ export const INITIAL_SERVICES: MCPService[] = [
     tags: ['Onboarding', 'Profiles', 'Device Audit'],
   },
   {
-    id: 'srv-3',
+    id: 'srv-proctoring',
     name: 'testorbit-proctoring-mcp',
     slug: 'proctoring-reentry-mcp',
-    description: 'Real-Time Proctoring Event Triage, Fraud Detection, Force Terminations & Reentry Approvals',
+    description: 'Real-Time Proctoring Incident Triage, Fraud Detection, Force Terminations & Reentry Approvals',
     status: 'ACTIVE',
     transport: 'SSE',
     endpoint: 'http://localhost:4003/mcp/sse',
@@ -125,21 +126,21 @@ export const INITIAL_SERVICES: MCPService[] = [
     tags: ['Proctoring', 'Reentry', 'Live Ops'],
   },
   {
-    id: 'srv-4',
+    id: 'srv-analytics',
     name: 'testorbit-analytics-mcp',
     slug: 'grading-analytics-mcp',
-    description: 'Auto MCQ Grading, Coding Review Queue, Aggregated Placement Analytics & Export Suite',
-    status: 'DEVELOPMENT',
+    description: 'Auto MCQ Grading, Subjective Coding Review Queue, Aggregated Placement Analytics & CSV Export',
+    status: 'ACTIVE',
     transport: 'STDIO',
     endpoint: 'npx -y testorbit-analytics-mcp',
-    port: 0,
+    port: 4004,
     protocolVersion: '2024-11-05',
     toolsCount: 9,
     capabilitiesCount: 4,
     health: {
-      uptimePct: 98.5,
-      latencyMs: 38,
-      lastPing: '12s ago',
+      uptimePct: 99.5,
+      latencyMs: 18,
+      lastPing: '4s ago',
     },
     tags: ['Evaluation', 'Coding Review', 'Reporting'],
   },
@@ -147,11 +148,11 @@ export const INITIAL_SERVICES: MCPService[] = [
 
 export const INITIAL_TOOLS: MCPTool[] = [
   {
-    id: 'tool-1',
+    id: 'tool-search-questions',
     name: 'search_questions',
-    serviceId: 'srv-1',
+    serviceId: 'srv-questions',
     serviceName: 'testorbit-questions-mcp',
-    description: 'Search and filter question bank by domain slug, difficulty (EASY/MEDIUM/HARD), section, or query.',
+    description: 'Search and filter question bank by domain slug, difficulty (EASY/MEDIUM/HARD), section, or text query.',
     capabilityTag: 'Authoring',
     riskLevel: 'LOW',
     inputSchema: {
@@ -173,17 +174,17 @@ export const INITIAL_TOOLS: MCPTool[] = [
       status: 'success',
       totalCount: 42,
       questions: [
-        { id: 'q-101', text: 'Explain Gradient Descent optimization', marks: 5, difficulty: 'MEDIUM', type: 'MCQ' },
-        { id: 'q-102', text: 'Implement Softmax function in Python', marks: 10, difficulty: 'MEDIUM', type: 'CODING' },
+        { id: 'q-101', text: 'Explain Gradient Descent optimization algorithm', marks: 5, difficulty: 'MEDIUM', type: 'MCQ' },
+        { id: 'q-102', text: 'Implement Softmax loss function in Python', marks: 10, difficulty: 'MEDIUM', type: 'CODING' },
       ],
     },
   },
   {
-    id: 'tool-2',
+    id: 'tool-create-paper',
     name: 'create_paper',
-    serviceId: 'srv-1',
+    serviceId: 'srv-questions',
     serviceName: 'testorbit-questions-mcp',
-    description: 'Create a question paper specification for a specific domain with section configurations.',
+    description: 'Create a question paper specification for a specific domain with section rules.',
     capabilityTag: 'Authoring',
     riskLevel: 'MEDIUM',
     inputSchema: {
@@ -208,7 +209,7 @@ export const INITIAL_TOOLS: MCPTool[] = [
       required: ['name', 'domainId', 'sections'],
     },
     samplePayload: {
-      name: 'Campus Recruitment Final 2026',
+      name: 'Campus Recruitment Final Assessment 2026',
       domainId: 'dom_aiml',
       durationMinutes: 60,
       negativeMarkingEnabled: true,
@@ -220,17 +221,17 @@ export const INITIAL_TOOLS: MCPTool[] = [
     mockOutput: {
       status: 'created',
       paperId: 'paper_9921',
-      name: 'Campus Recruitment Final 2026',
+      name: 'Campus Recruitment Final Assessment 2026',
       isActive: false,
       sectionsCount: 2,
     },
   },
   {
-    id: 'tool-3',
+    id: 'tool-search-students',
     name: 'search_students',
-    serviceId: 'srv-2',
+    serviceId: 'srv-candidates',
     serviceName: 'testorbit-candidates-mcp',
-    description: 'Lookup student profiles by registration number, college email, or college name.',
+    description: 'Lookup candidate profiles by registration number, college email, or college name.',
     capabilityTag: 'Onboarding',
     riskLevel: 'LOW',
     inputSchema: {
@@ -259,9 +260,9 @@ export const INITIAL_TOOLS: MCPTool[] = [
     },
   },
   {
-    id: 'tool-4',
+    id: 'tool-get-proctoring-events',
     name: 'get_proctoring_events',
-    serviceId: 'srv-3',
+    serviceId: 'srv-proctoring',
     serviceName: 'testorbit-proctoring-mcp',
     description: 'Fetch detailed proctoring violation event log for a live assessment session.',
     capabilityTag: 'Proctoring',
@@ -288,9 +289,9 @@ export const INITIAL_TOOLS: MCPTool[] = [
     },
   },
   {
-    id: 'tool-5',
+    id: 'tool-approve-reentry',
     name: 'approve_reentry_request',
-    serviceId: 'srv-3',
+    serviceId: 'srv-proctoring',
     serviceName: 'testorbit-proctoring-mcp',
     description: 'Approve candidate reentry, generate single-use resume hash, and grant time extension.',
     capabilityTag: 'Proctoring',
@@ -318,9 +319,9 @@ export const INITIAL_TOOLS: MCPTool[] = [
     },
   },
   {
-    id: 'tool-6',
+    id: 'tool-finalize-score',
     name: 'finalize_session_score',
-    serviceId: 'srv-4',
+    serviceId: 'srv-analytics',
     serviceName: 'testorbit-analytics-mcp',
     description: 'Calculate final MCQ score, sum coding scores, and mark evaluation complete.',
     capabilityTag: 'Evaluation',
@@ -351,17 +352,17 @@ export const INITIAL_TRIAGE_SCENARIOS: TriageScenario[] = [
     id: 'tri-1',
     userPrompt: 'Candidate REG-2026-0941 lost power during section B. Please approve their reentry and give 10 extra minutes.',
     category: 'Reentry & Interruption Ops',
-    matchedServiceIds: ['srv-3', 'srv-2'],
+    matchedServiceIds: ['srv-proctoring', 'srv-candidates'],
     suggestedTools: [
       {
-        toolId: 'tool-3',
+        toolId: 'tool-search-students',
         toolName: 'search_students',
-        confidence: 0.94,
+        confidence: 0.95,
         reason: 'Lookup student ID and active assessment session for REG-2026-0941',
         extractedArgs: { registrationNumber: 'REG-2026-0941' },
       },
       {
-        toolId: 'tool-5',
+        toolId: 'tool-approve-reentry',
         toolName: 'approve_reentry_request',
         confidence: 0.98,
         reason: 'Approve pending reentry request with 10 minutes time adjustment',
@@ -379,17 +380,17 @@ export const INITIAL_TRIAGE_SCENARIOS: TriageScenario[] = [
     id: 'tri-2',
     userPrompt: 'Create a new assessment paper for AI / Machine Learning with 15 MCQ questions and 2 coding problems.',
     category: 'Question Paper Assembly',
-    matchedServiceIds: ['srv-1'],
+    matchedServiceIds: ['srv-questions'],
     suggestedTools: [
       {
-        toolId: 'tool-1',
+        toolId: 'tool-search-questions',
         toolName: 'search_questions',
         confidence: 0.91,
         reason: 'Check question bank pool depth for domain aiml-eng',
         extractedArgs: { domainSlug: 'aiml-eng', limit: 20 },
       },
       {
-        toolId: 'tool-2',
+        toolId: 'tool-create-paper',
         toolName: 'create_paper',
         confidence: 0.96,
         reason: 'Construct paper schema with MCQ and Coding sections',
@@ -415,12 +416,12 @@ export const INITIAL_TRIAGE_SCENARIOS: TriageScenario[] = [
 
 export const INITIAL_INSPECTOR_SESSIONS: MCPInspectorConnection[] = [
   {
-    id: 'insp-1',
-    name: 'testorbit-proctoring-mcp (Local SSE)',
+    id: 'insp-proctoring',
+    name: 'testorbit-proctoring-mcp (SSE)',
     transport: 'SSE',
     urlOrCommand: 'http://localhost:4003/mcp/sse',
     status: 'CONNECTED',
-    connectedAt: '2026-10-08T20:30:00Z',
+    connectedAt: new Date().toISOString(),
     serverInfo: {
       name: 'testorbit-proctoring-mcp',
       version: '1.2.0',
@@ -434,12 +435,12 @@ export const INITIAL_INSPECTOR_SESSIONS: MCPInspectorConnection[] = [
     },
   },
   {
-    id: 'insp-2',
+    id: 'insp-questions',
     name: 'testorbit-questions-mcp (Stdio)',
     transport: 'STDIO',
     urlOrCommand: 'node ./dist/questions-mcp.js',
     status: 'CONNECTED',
-    connectedAt: '2026-10-08T20:32:15Z',
+    connectedAt: new Date().toISOString(),
     serverInfo: {
       name: 'testorbit-questions-mcp',
       version: '1.0.4',
